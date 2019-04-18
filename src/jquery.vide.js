@@ -153,6 +153,10 @@
     return { x: x, y: y };
   }
 
+  function replaceExtension(path, extension) {
+    return path.replace('{extension}', extension);
+  }
+
   /**
    * Search a poster
    * @private
@@ -164,10 +168,9 @@
       callback(this.src);
     };
 
-    $('<img src="' + path + '.gif">').on('load', onLoad);
-    $('<img src="' + path + '.jpg">').on('load', onLoad);
-    $('<img src="' + path + '.jpeg">').on('load', onLoad);
-    $('<img src="' + path + '.png">').on('load', onLoad);
+    ['gif', 'jpg', 'jpeg', 'png'].forEach(function(extension) {
+      $('<img src="' + replaceExtension(path, extension) + '">').on('load', onLoad);
+    });
   }
 
   /**
@@ -190,17 +193,6 @@
       options = {};
     } else if (typeof options === 'string') {
       options = parseOptions(options);
-    }
-
-    // Remove an extension
-    if (typeof path === 'string') {
-      path = path.replace(/\.\w*$/, '');
-    } else if (typeof path === 'object') {
-      for (var i in path) {
-        if (path.hasOwnProperty(i)) {
-          path[i] = path[i].replace(/\.\w*$/, '');
-        }
-      }
     }
 
     this.settings = $.extend({}, DEFAULTS, options);
@@ -273,7 +265,7 @@
         $wrapper.css('background-image', 'url(' + url + ')');
       });
     } else if (posterType !== 'none') {
-      $wrapper.css('background-image', 'url(' + poster + '.' + posterType + ')');
+      $wrapper.css('background-image', 'url(' + replaceExtension(poster, posterType) + ')');
     }
 
     // If a parent element has a static position, make it relative
@@ -285,23 +277,23 @@
 
     if (typeof path === 'object') {
       if (path.mp4) {
-        sources += '<source src="' + path.mp4 + '.mp4" type="video/mp4">';
+        sources += '<source src="' + replaceExtension(path.mp4, 'mp4') + '" type="video/mp4">';
       }
 
       if (path.webm) {
-        sources += '<source src="' + path.webm + '.webm" type="video/webm">';
+        sources += '<source src="' + replaceExtension(path.webm, 'webm') + '" type="video/webm">';
       }
 
       if (path.ogv) {
-        sources += '<source src="' + path.ogv + '.ogv" type="video/ogg">';
+        sources += '<source src="' + replaceExtension(path.ogv, 'ogv') + '" type="video/ogg">';
       }
 
       $video = vide.$video = $('<video>' + sources + '</video>');
     } else {
       $video = vide.$video = $('<video>' +
-        '<source src="' + path + '.mp4" type="video/mp4">' +
-        '<source src="' + path + '.webm" type="video/webm">' +
-        '<source src="' + path + '.ogv" type="video/ogg">' +
+        '<source src="' + replaceExtension(path, 'mp4') + '" type="video/mp4">' +
+        '<source src="' + replaceExtension(path, 'webm') + '" type="video/webm">' +
+        '<source src="' + replaceExtension(path, 'ogv') + '" type="video/ogg">' +
         '</video>');
     }
 
